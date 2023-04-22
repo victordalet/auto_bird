@@ -1,3 +1,183 @@
+/* *********************************************************************** */
+/*                                                                         */
+/* OBJECTIVE : RL                          #####      ###    ###    #      */
+/* AUTHOR :  VICTOR DALET                  #         #      #       #      */
+/* CREATED : 22 04 2023                    ####      #      #  ##   #      */
+/* UPDATE  : 23 04 2023                    #         #      #   #   #      */
+/*                                         ####    ###      #####   #.fr   */
+/* *********************************************************************** */
+
+
+
+class Matrix {
+    constructor(rows, cols) {
+        this.rows = rows;
+        this.cols = cols;
+        this.data = Array(this.rows).fill().map(() => Array(this.cols).fill(0));
+    }
+
+    copy() {
+        let m = new Matrix(this.rows, this.cols);
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                m.data[i][j] = this.data[i][j];
+            }
+        }
+        return m;
+    }
+
+    static fromArray(arr) {
+        return new Matrix(arr.length, 1).map((e, i) => arr[i]);
+    }
+
+    toArray() {
+        let arr = [];
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                arr.push(this.data[i][j]);
+            }
+        }
+        return arr;
+    }
+
+    randomize() {
+        return this.map(e => Math.random() * 2 - 1);
+    }
+
+    add(n) {
+        if (n instanceof Matrix) {
+            if (this.rows !== n.rows || this.cols !== n.cols) {
+                return;
+            }
+            return this.map((e, i, j) => e + n.data[i][j]);
+        } else {
+            return this.map(e => e + n);
+        }
+    }
+
+
+    static multiply(a, b) {
+        if (a.cols !== b.rows) {
+            return;
+        }
+
+        return new Matrix(a.rows, b.cols)
+            .map((e, i, j) => {
+                let sum = 0;
+                for (let k = 0; k < a.cols; k++) {
+                    sum += a.data[i][k] * b.data[k][j];
+                }
+                return sum;
+            });
+    }
+
+
+    map(func) {
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                let val = this.data[i][j];
+                this.data[i][j] = func(val, i, j);
+            }
+        }
+        return this;
+    }
+
+}
+
+
+/*------------------------------------------------------*/
+class ActivationFunction {
+    constructor(func, dfunc) {
+        this.func = func;
+        this.dfunc = dfunc;
+    }
+}
+
+let sigmoid = new ActivationFunction(
+    x => 1 / (1 + Math.exp(-x)),
+    y => y * (1 - y)
+);
+
+
+
+class NeuralNetwork {
+    constructor(a, b, c) {
+        if (a instanceof NeuralNetwork) {
+            this.input_nodes = a.input_nodes;
+            this.hidden_nodes = a.hidden_nodes;
+            this.output_nodes = a.output_nodes;
+
+            this.weights_ih = a.weights_ih.copy();
+            this.weights_ho = a.weights_ho.copy();
+
+            this.bias_h = a.bias_h.copy();
+            this.bias_o = a.bias_o.copy();
+        } else {
+            this.input_nodes = a;
+            this.hidden_nodes = b;
+            this.output_nodes = c;
+
+            this.weights_ih = new Matrix(this.hidden_nodes, this.input_nodes);
+            this.weights_ho = new Matrix(this.output_nodes, this.hidden_nodes);
+            this.weights_ih.randomize();
+            this.weights_ho.randomize();
+
+            this.bias_h = new Matrix(this.hidden_nodes, 1);
+            this.bias_o = new Matrix(this.output_nodes, 1);
+            this.bias_h.randomize();
+            this.bias_o.randomize();
+        }
+
+        this.setLearningRate();
+        this.setActivationFunction();
+
+
+    }
+
+    predict(input_array) {
+
+        let inputs = Matrix.fromArray(input_array);
+        let hidden = Matrix.multiply(this.weights_ih, inputs);
+        hidden.add(this.bias_h);
+        hidden.map(this.activation_function.func);
+
+        let output = Matrix.multiply(this.weights_ho, hidden);
+        output.add(this.bias_o);
+        output.map(this.activation_function.func);
+
+        return output.toArray();
+    }
+
+    setLearningRate(learning_rate = 0.1) {
+        this.learning_rate = learning_rate;
+    }
+
+    setActivationFunction(func = sigmoid) {
+        this.activation_function = func;
+    }
+
+    copy() {
+        return new NeuralNetwork(this);
+    }
+
+    mutate(rate) {
+        function mutate(val) {
+            if (Math.random() < rate) {
+                return val + randomGaussian(0, 0.1);
+            } else {
+                return val;
+            }
+        }
+        this.weights_ih.map(mutate);
+        this.weights_ho.map(mutate);
+        this.bias_h.map(mutate);
+        this.bias_o.map(mutate);
+    }
+}
+
+/*--------------------------*/
+/*--------------------------*/
+/*--------------------------*/
 class Bird {
     constructor(brain) {
         this.y = height / 2;
@@ -116,7 +296,7 @@ class Pipe {
 /*-----------------------------------------------*/
 
 function nextGeneration() {
-    console.log('next generation');
+    console.log('NEXT');
     calculateFitness();
     for (let i = 0; i < TOTAL; i++) {
         birds[i] = pickOne();
@@ -126,7 +306,7 @@ function nextGeneration() {
 
 function pickOne() {
     let index = 0;
-    let r = random(1);
+    let r = Math.random();
     while (r > 0) {
         r = r - savedBirds[index].fitness;
         index++;
