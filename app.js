@@ -1,191 +1,219 @@
-class Map {
-    constructor() {
-        document.querySelector('body').style.margin = '0';
-        const _ = 0
-        this.map = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,1,1,1,1,1,_,_,_,_,1,1,1,1,1,1,_,_,_,_,_,_,_,_,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,1,1,1,_,_,_,_,_,_,_,_,_,_,_,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,_,_,_,_,_,_,1,_,_,_,_,1,_,_,1,_,_,_,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,_,_,_,_,_,_,1,1,1,_,_,_,_,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,_,_,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,_,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
-    }
+class Bird {
+    constructor(brain) {
+        this.y = height / 2;
+        this.x = 64;
 
-    display_map() {
-        const container  = document.createElement('div');
-        container.style.display = 'grid';
-        for (let i = 0 ; i < this.map.length ; i++) {
-            const big_div = document.createElement('div')
-            big_div.style.display = 'inline-flex';
-            for (let j = 0 ; j < this.map[i].length ; j++) {
-                const div = document.createElement('div');
-                div.style.width = "20px";
-                div.style.height = "20px";
-                if (this.map[i][j] === 0 ) {
-                    div.style.background = 'grey';
-                }
-                else {
-                    div.style.background  = 'green';
-                }
-                big_div.appendChild(div);
-            }
-            container.appendChild(big_div);
-        }
-
-        document.querySelector('body').appendChild(container);
-    }
+        this.gravity = 0.8;
+        this.lift = -12;
+        this.velocity = 0;
 
 
-    get_map() {
-        return this.map;
-    }
-}
-
-class Car {
-    constructor(map) {
-        this.map = map;
-        this.x = 1;
-        this.y = 1;
-        this.display_car();
-        this.create_btn_reset();
-        this.q_table = [];
-        for (let i = 0 ; i < 5*5 ; i++) {
-            this.q_table.push([0,0])
-        }
-        this.exploration = 1;
-        this.alpha = 1;
-        this.gamma = 1;
-        this.cooling_rate = 0.99;
-        this.table_case = [];
         this.score = 0;
-    }
-
-
-    display_car() {
-        this.car = document.createElement('div');
-        this.car.style.width = "15px";
-        this.car.style.height = "15px";
-        this.car.style.background = "black";
-        this.car.style.position = 'absolute';
-        this.car.style.zIndex = "2";
-        this.car.style.top = '20px';
-        this.car.style.left = "20px";
-        document.querySelector('body').appendChild(this.car);
-        return this.car;
-    }
-
-    get_information_captor() {
-        let lst_captor = [];
-        lst_captor.push(this.map[this.x+1][this.y])
-        lst_captor.push(this.map[this.x-1][this.y])
-        lst_captor.push(this.map[this.x-1][this.y+1])
-        lst_captor.push(this.map[this.x][this.y+1])
-        lst_captor.push(this.map[this.x+1][this.y+1])
-        return lst_captor;
-    }
-
-    get_state() {
-        return (this.map[this.y][this.x] === 0 ? 1 : -1);
-    }
-
-    up_x() {
-        this.x++;
-        this.car.style.left = (this.x * 20).toString() + 'px';
-        this.reset_car();
-    }
-
-    up_y() {
-        this.y++;
-        this.car.style.top = (this.y * 20).toString() + 'px';
-        this.reset_car();
-    }
-
-    down_y() {
-        this.y--;
-        this.car.style.top = (this.y * 20).toString() + 'px';
-        this.reset_car();
-    }
-
-
-    best_action() {
-        if (Math.random() < this.exploration) {
-            this.exploration *= this.cooling_rate;
-            return (Math.random() < 5) ? 1 : 0;
+        this.fitness = 0;
+        if (brain) {
+            this.brain = brain.copy();
+        } else {
+            this.brain = new NeuralNetwork(5, 8, 2);
         }
 
     }
 
-
-    reset_car() {
-        if (this.get_state() === -1) {
-            this.x = 1;
-            this.y = 1;
-            this.car.style.left = (this.x * 20).toString() + 'px';
-            this.car.style.top = (this.y * 20).toString() + 'px';
-            this.table_case.pop();
-            this.q_table.push(this.table_case);
-            this.table_case = [];
-            this.exploration -= .1;
-            this.score = 0;
-        }
+    show() {
+        stroke(255);
+        fill(255, 100);
+        ellipse(this.x, this.y, 32, 32);
     }
 
-    somme_state(env) {
-        let somme = 0;
-        for (let i = 0 ; i < env.length ; i++) {
-            somme += env[i];
-        }
-        return somme;
+    up() {
+        this.velocity += this.lift;
     }
 
-    create_btn_reset() {
-        const btn_reset = document.createElement('button');
-        btn_reset.innerHTML = 'reset';
-        btn_reset.onclick = () => {
-            this.x = 0;
-            this.y = 0;
-            this.up_x();
-        }
-        document.querySelector('body').appendChild(btn_reset);
+    mutate() {
+        this.brain.mutate(0.1);
     }
 
+    think(pipes) {
 
-    max_table(table) {
-        let max = table[0];
-        for (let i = 0 ; i < table.length ; i++) {
-            if (max < table[i]) {
-                max = table[i];
+        let closest = null;
+        let closestD = Infinity;
+        for (let i = 0; i < pipes.length; i++) {
+            let d = (pipes[i].x + pipes[i].w) - this.x;
+            if (d < closestD && d > 0) {
+                closest = pipes[i];
+                closestD = d;
             }
         }
-        return max;
-    }
 
-    train() {
-        setInterval(() => {
-            this.up_x();
-            const action = this.best_action();
-            const env = this.get_information_captor()
-            const state = this.somme_state(env);
-            const reward = (this.get_state() === 1) ? self.score : -1;
-            const maxQ = this.max_table(this.q_table[state]);
-            this.q_table[state][action] += this.alpha * (reward + this.gamma * maxQ - this.q_table[this.q_table[state][action]])
-            //(action === 0) ? this.down_y() : this.up_y();
-        },100)
+
+        let inputs = [];
+        inputs[0] = this.y / height;
+        inputs[1] = closest.top / height;
+        inputs[2] = closest.bottom / height;
+        inputs[3] = closest.x / width;
+        inputs[4] = this.velocity / 10;
+        let output = this.brain.predict(inputs);
+        if (output[0] > output[1]) {
+            this.up();
+        }
 
     }
 
+    offScreen() {
+        return (this.y > height || this.y < 0);
+    }
+
+    update() {
+        this.score++;
+        this.velocity += this.gravity;
+        this.y += this.velocity;
+    }
 
 }
 
+/*-----------------------------------------------*/
+
+class Pipe {
+
+    constructor() {
+        this.spacing = 125;
+        this.top = random(height / 6, 3 / 4 * height);
+        this.bottom = height - (this.top + this.spacing);
+        this.x = width;
+        this.w = 80;
+        this.speed = 6;
+    }
+
+    hits(bird) {
+        if (bird.y < this.top || bird.y > height - this.bottom) {
+            if (bird.x > this.x && bird.x < this.x + this.w) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    show() {
+        fill(255);
+        rectMode(CORNER);
+        rect(this.x, 0, this.w, this.top);
+        rect(this.x, height - this.bottom, this.w, this.bottom);
+    }
+
+    update() {
+        this.x -= this.speed;
+    }
+
+    offscreen() {
+        if (this.x < -this.w) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
 
 
-/*------------------------MAIN------------------------*/
-const creator = new Map();
-creator.display_map();
-const car = new Car(creator.get_map());
-car.train();
+/*-----------------------------------------------*/
+
+function nextGeneration() {
+    console.log('next generation');
+    calculateFitness();
+    for (let i = 0; i < TOTAL; i++) {
+        birds[i] = pickOne();
+    }
+    savedBirds = [];
+}
+
+function pickOne() {
+    let index = 0;
+    let r = random(1);
+    while (r > 0) {
+        r = r - savedBirds[index].fitness;
+        index++;
+    }
+    index--;
+    let bird = savedBirds[index];
+    let child = new Bird(bird.brain);
+    child.mutate();
+    return child;
+}
+
+function calculateFitness() {
+    let sum = 0;
+    for (let bird of savedBirds) {
+        sum += bird.score;
+    }
+    for (let bird of savedBirds) {
+        bird.fitness = bird.score / sum;
+    }
+}
+
+/*-----------------------------------------------*/
+
+const TOTAL = 100;
+let birds = [];
+let savedBirds = [];
+let pipes = [];
+let counter = 0;
+let slider;
+
+
+function setup() {
+    createCanvas(640, 480);
+    slider = createSlider(1, 10, 1);
+    for (let i = 0; i < TOTAL; i++) {
+        birds[i] = new Bird();
+    }
+}
+
+function draw() {
+    for (let n = 0; n < slider.value(); n++) {
+        if (counter % 75 == 0) {
+            pipes.push(new Pipe());
+        }
+        counter++;
+
+        for (let i = pipes.length - 1; i >= 0; i--) {
+            pipes[i].update();
+
+            for (let j = birds.length - 1; j >= 0; j--) {
+                if (pipes[i].hits(birds[j])) {
+                    savedBirds.push(birds.splice(j, 1)[0]);
+                }
+            }
+
+            if (pipes[i].offscreen()) {
+                pipes.splice(i, 1);
+            }
+        }
+
+        for (let i = birds.length - 1; i >= 0; i--) {
+            if (birds[i].offScreen()) {
+                savedBirds.push(birds.splice(i, 1)[0]);
+            }
+        }
+
+        for (let bird of birds) {
+            bird.think(pipes);
+            bird.update();
+        }
+
+        if (birds.length === 0) {
+            counter = 0;
+            nextGeneration();
+            pipes = [];
+        }
+    }
+
+    background(0);
+
+    for (let bird of birds) {
+        bird.show();
+    }
+
+    for (let pipe of pipes) {
+        pipe.show();
+    }
+}
+
 
