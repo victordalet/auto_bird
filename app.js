@@ -8,7 +8,6 @@
 /* *********************************************************************** */
 
 
-
 class Matrix {
     constructor(rows, cols) {
         this.rows = rows;
@@ -87,15 +86,13 @@ class Matrix {
 
 /*------------------------------------------------------*/
 class ActivationFunction {
-    constructor(func, dfunc) {
+    constructor(func) {
         this.func = func;
-        this.dfunc = dfunc;
     }
 }
 
 let sigmoid = new ActivationFunction(
-    x => 1 / (1 + Math.exp(-x)),
-    y => y * (1 - y)
+        ?
 );
 
 
@@ -163,7 +160,7 @@ class NeuralNetwork {
     mutate(rate) {
         function mutate(val) {
             if (Math.random() < rate) {
-                return val + randomGaussian(0, 0.1);
+                return val + Math.random()* .1 * ((Math.random() < .5) ? -1 : 1);
             } else {
                 return val;
             }
@@ -193,14 +190,13 @@ class Bird {
         if (brain) {
             this.brain = brain.copy();
         } else {
-            this.brain = new NeuralNetwork(5, 8, 2);
+            this.brain = ?
         }
 
     }
 
     show() {
-        stroke(255);
-        fill(255, 100);
+        fill(255,0,0);
         ellipse(this.x, this.y, 32, 32);
     }
 
@@ -226,14 +222,14 @@ class Bird {
 
 
         let inputs = [];
-        inputs[0] = this.y / height;
-        inputs[1] = closest.top / height;
-        inputs[2] = closest.bottom / height;
-        inputs[3] = closest.x / width;
-        inputs[4] = this.velocity / 10;
-        let output = this.brain.predict(inputs);
+        inputs[0] = ?
+            inputs[1] = ?
+                inputs[2] = ?
+                    inputs[3] = ?
+                        inputs[4] = ?
+                            let output = ?
         if (output[0] > output[1]) {
-            this.up();
+                ?
         }
 
     }
@@ -256,7 +252,7 @@ class Pipe {
 
     constructor() {
         this.spacing = 125;
-        this.top = random(height / 6, 3 / 4 * height);
+        this.top = Math.random() * (3/4*height  - height / 6 ) + height / 6;
         this.bottom = height - (this.top + this.spacing);
         this.x = width;
         this.w = 80;
@@ -273,8 +269,7 @@ class Pipe {
     }
 
     show() {
-        fill(255);
-        rectMode(CORNER);
+        fill(0,255,0);
         rect(this.x, 0, this.w, this.top);
         rect(this.x, height - this.bottom, this.w, this.bottom);
     }
@@ -330,24 +325,24 @@ function calculateFitness() {
 
 /*-----------------------------------------------*/
 
-const TOTAL = 100;
+const TOTAL = ?
+const SPEED = 1;
+
 let birds = [];
 let savedBirds = [];
 let pipes = [];
 let counter = 0;
-let slider;
 
 
 function setup() {
     createCanvas(640, 480);
-    slider = createSlider(1, 10, 1);
     for (let i = 0; i < TOTAL; i++) {
         birds[i] = new Bird();
     }
 }
 
 function draw() {
-    for (let n = 0; n < slider.value(); n++) {
+    for (let n = 0; n < SPEED; n++) {
         if (counter % 75 == 0) {
             pipes.push(new Pipe());
         }
@@ -385,7 +380,7 @@ function draw() {
         }
     }
 
-    background(0);
+    background(30,30,30);
 
     for (let bird of birds) {
         bird.show();
